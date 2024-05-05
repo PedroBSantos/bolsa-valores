@@ -1,0 +1,8 @@
+{:database {:subname "//localhost:5432/postgres"
+            :host "localhost"
+            :port "5432"
+            :dbname "bolsa_valores"
+            :subprotocol "postgres"
+            :dbtype "postgres"
+            :user "postgres"
+            :password "postgres"}}

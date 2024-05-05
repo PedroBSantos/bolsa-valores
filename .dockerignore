@@ -1,0 +1,11 @@
+**/target
+**/.git
+**/.calva
+**/.clj-kondo
+**/.lsp
+LICENSE
+README.md
+.gitignore
+.hgignore
+.lein-failures
+CHANGELOG.md

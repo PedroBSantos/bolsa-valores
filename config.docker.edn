@@ -1,0 +1,8 @@
+{:database {:subname "//postgres-container:5432/postgres"
+            :host "postgres-container"
+            :port "5432"
+            :dbname "bolsa_valores"
+            :subprotocol "postgres"
+            :dbtype "postgres"
+            :user "postgres"
+            :password "postgres"}}

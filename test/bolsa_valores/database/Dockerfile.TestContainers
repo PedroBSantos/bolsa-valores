@@ -1,0 +1,7 @@
+FROM postgres:alpine
+EXPOSE 5432
+ENV TZ=America/Recife
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+ENV POSTGRES_DB=bolsa_valores
+ADD ./tables.sql /docker-entrypoint-initdb.d/
