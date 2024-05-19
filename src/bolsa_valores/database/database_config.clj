@@ -1,10 +1,15 @@
 (ns bolsa-valores.database.database-config
-  (:require [hugsql.core :as hugsql]
+  (:require [clojure.edn :as edn]
+            [clojure.java.io :as io]
             [hugsql.adapter.next-jdbc :as next-adapter]
-            [clojure.edn :as edn]))
+            [hugsql.core :as hugsql]))
 
-(def config (edn/read-string (slurp "config.edn")))
-(def database-config (:database config))
+(def application-conf (System/getProperty "conf"))
+(defonce database-config (-> application-conf
+                             io/resource
+                             slurp
+                             edn/read-string
+                             :database))
 
 (hugsql/def-db-fns
   "bolsa_valores/database/sql/queries.sql"

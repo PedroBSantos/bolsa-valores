@@ -21,5 +21,7 @@
                  [clj-test-containers "0.7.4"]]
   :main ^:skip-aot bolsa-valores.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all
-                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})
+  :profiles {:dev {:aot :all
+                   :jvm-opts ["-Dclojure.compiler.direct-linking=true" "-Dconf=config/dev.edn"]}
+             :docker {:aot :all
+                      :jvm-opts ["-Dclojure.compiler.direct-linking=true" "-Dconf=config/docker.edn"]}})
