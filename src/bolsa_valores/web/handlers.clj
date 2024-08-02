@@ -15,6 +15,11 @@
       (created (str request-uri "/" (get-in response-body [:output :id])) response-body)
       (bad-request response-body))))
 
+(defn proventos-handler [_]
+  (let [todas-proventos (q/read-all-proventos)]
+    {:status 200
+     :body todas-proventos}))
+
 (defn nova-compra-handler [request]
   (let [request-body (get request :body {})
         nova-compra (registra-nova-compra! q/insert-compra request-body)
@@ -23,6 +28,11 @@
     (if (= :clojure.spec.alpha/valid (:valid nova-compra))
       (created (str request-uri "/" (get-in response-body [:output :id])) response-body)
       (bad-request response-body))))
+
+(defn compras-handler [_]
+  (let [todas-compras (q/read-all-compras)]
+    {:status 200
+     :body todas-compras}))
 
 (defn total-comprado-na-acao-handler [request]
   (let [ticket-acao (.toUpperCase (get-in request [:query-params "codigo-acao"] ""))
