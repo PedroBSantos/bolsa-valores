@@ -4,8 +4,10 @@
             [compojure.route :as route]))
 
 (defroutes app-routes
-  (POST "/proventos" [] h/novo-provento-handler)
-  (POST "/compras" [] h/nova-compra-handler)
-  (GET "/compras/total-comprado*" [] h/total-comprado-handler)
-  (GET "/proventos/total-recebido*" [] h/total-recebido-handler)
+  (POST "/proventos/adicionar-provento" [] h/novo-provento-handler)
+  (POST "/compras/adicionar-compra" [] h/nova-compra-handler)
+  (GET "/compras/total-comprado-na-acao*" [] h/total-comprado-na-acao-handler)
+  (GET "/compras/total-comprado" [] h/total-comprado-handler)
+  (GET "/proventos/total-recebido-na-acao*" [] h/total-recebido-na-acao-handler)
+  (GET "/proventos/total-recebido" [] h/total-recebido-handler)
   (route/not-found "Path Not Found"))

@@ -36,15 +36,23 @@
     {:valid :clojure.spec.alpha/invalid
      :output provento}))
 
-(defn- do-total-recebido [codigo-acao todos-proventos]
+(defn- do-total-recebido 
+  ([codigo-acao todos-proventos]
   (let [proventos-da-acao (pega-todos-proventos-pelo-codigo-acao codigo-acao todos-proventos)
         proventos-da-acao (pega-todos-proventos-recebidos-ate-data-atual proventos-da-acao)
         total (calcula-total-recebido proventos-da-acao)]
     {:valid :clojure.spec.alpha/valid
      :total-recebido total}))
+  ([todos-proventos]
+   (let [total (calcula-total-recebido todos-proventos)]
+     {:valid :clojure.spec.alpha/valid
+      :total-recebido total})))
 
-(defn total-recebido [codigo-acao todos-proventos]
+(defn total-recebido 
+  ([codigo-acao todos-proventos]
   (if (codigo-acao? codigo-acao)
     (do-total-recebido codigo-acao todos-proventos)
     {:valid :clojure.spec.alpha/invalid
      :output {:codigo-acao codigo-acao}}))
+  ([todos-proventos]
+   (do-total-recebido todos-proventos)))

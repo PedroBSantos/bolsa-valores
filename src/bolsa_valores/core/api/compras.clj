@@ -28,18 +28,26 @@
 (defn registra-nova-compra!
   [adiciona-compra! compra]
   (if (s/valid? ::nova-compra-spec compra)
-    (do-registra-nova-compra! adiciona-compra! compra) 
+    (do-registra-nova-compra! adiciona-compra! compra)
     {:valid :clojure.spec.alpha/invalid
      :output compra}))
 
-(defn- do-total-comprado [codigo-acao todas-compras]
-  (let [compras (pega-todas-compras-pelo-codigo-acao codigo-acao todas-compras)
-        total-comprado (calcula-total-comprado compras)]
-    {:valid :clojure.spec.alpha/valid
-     :total-comprado total-comprado}))
+(defn- do-total-comprado
+  ([codigo-acao todas-compras]
+   (let [compras (pega-todas-compras-pelo-codigo-acao codigo-acao todas-compras)
+         total-comprado (calcula-total-comprado compras)]
+     {:valid :clojure.spec.alpha/valid
+      :total-comprado total-comprado}))
+  ([todas-compras]
+   (let [total-comprado (calcula-total-comprado todas-compras)]
+     {:valid :clojure.spec.alpha/valid
+      :total-comprado total-comprado})))
 
-(defn total-comprado [codigo-acao todas-compras]
-  (if (codigo-acao? codigo-acao)
-    (do-total-comprado codigo-acao todas-compras)
-    {:valid :clojure.spec.alpha/invalid
-     :output {:codigo-acao codigo-acao}}))
+(defn total-comprado
+  ([codigo-acao todas-compras]
+   (if (codigo-acao? codigo-acao)
+     (do-total-comprado codigo-acao todas-compras)
+     {:valid :clojure.spec.alpha/invalid
+      :output {:codigo-acao codigo-acao}}))
+  ([todas-compras]
+   (do-total-comprado todas-compras)))
