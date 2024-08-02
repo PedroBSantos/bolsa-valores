@@ -8,7 +8,8 @@
             [ring.middleware.defaults :refer [api-defaults wrap-defaults]]
             [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.reload :refer [wrap-reload]])
+            [ring.middleware.reload :refer [wrap-reload]]
+            [ring.middleware.cors :refer [wrap-cors]])
   (:import [java.time LocalDate]))
 
 (extend-protocol gen/JSONable
@@ -18,6 +19,8 @@
 
 (def app
   (-> app-routes
+      (wrap-cors :access-control-allow-origin [#".*"]
+                 :access-control-allow-methods [:get :put :post :delete :patch :options])
       wrap-log-response
       (wrap-json-body {:keywords? true :bigdecimals? true})
       (wrap-json-response {:keywords? true :bigdecimals? true})

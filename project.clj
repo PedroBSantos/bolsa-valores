@@ -18,7 +18,8 @@
                  [ring-logger/ring-logger "1.1.1"]
                  [org.clojure/data.json "2.5.0"]
                  [org.slf4j/slf4j-simple "2.0.12"]
-                 [clj-test-containers "0.7.4"]]
+                 [clj-test-containers "0.7.4"]
+                 [ring-cors "0.1.13"]]
   :main ^:skip-aot bolsa-valores.core
   :target-path "target/%s"
   :profiles {:dev {:aot :all
