@@ -1,6 +1,8 @@
 (ns bolsa-valores.core.domain.logic-test
   (:require [bolsa-valores.core.domain.logic :refer [aplica-imposto
+                                                     calcula-preco-medio
                                                      calcula-total-comprado
+                                                     calcula-total-de-acoes
                                                      calcula-total-recebido
                                                      codigo-acao?
                                                      pega-todas-compras-pelo-codigo-acao
@@ -114,3 +116,18 @@
           provento-2 (new-provento (random-uuid) "PETR4" (str amanha) "DIVIDENDO" 0.54)
           proventos [provento-1 provento-2]]
       (is (= 1.08 (calcula-total-recebido proventos))))))
+
+(deftest calcula-total-de-acoes-test
+  (testing "Deveria retornar o total de ações compradas"
+    (let [compra-1 (new-compra (random-uuid) "VALE3" (str (LocalDate/now)) 60.0 1)
+          compra-2 (new-compra (random-uuid) "VALE3" (str (LocalDate/now)) 60.0 1)
+          compra-3 (new-compra (random-uuid) "PETR4" (str (LocalDate/now)) 41.20 1)
+          compras [compra-1 compra-2 compra-3]]
+      (is (= 3 (calcula-total-de-acoes compras)))
+      (is (zero? (calcula-total-de-acoes []))))))
+
+(deftest calcula-preco-medio-test
+  (testing "Deveria retornar o preço médio de uma ação"
+    (let [compra-1 (new-compra (random-uuid) "GOAU4" (str (LocalDate/now)) 9.94 40)
+          compra-2 (new-compra (random-uuid) "GOAU4" (str (LocalDate/now)) 10.0 40)]
+      (is (= 9.969999999999999 (calcula-preco-medio [compra-1 compra-2]))))))

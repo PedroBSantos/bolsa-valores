@@ -1,7 +1,9 @@
 (ns bolsa-valores.core.api.compras
-  (:require [bolsa-valores.core.domain.logic :refer [calcula-total-comprado
+  (:require [bolsa-valores.core.domain.logic :refer [calcula-preco-medio
+                                                     calcula-total-comprado
                                                      codigo-acao?
-                                                     pega-todas-compras-pelo-codigo-acao]]
+                                                     pega-todas-compras-pelo-codigo-acao
+                                                     calcula-total-de-acoes]]
             [bolsa-valores.core.domain.model :refer [new-compra]]
             [clojure.spec.alpha :as s])
   (:import [java.time LocalDate]
@@ -51,3 +53,25 @@
       :output {:codigo-acao codigo-acao}}))
   ([todas-compras]
    (do-total-comprado todas-compras)))
+
+(defn- do-descrever-compras
+  [codigo-acao todas-compras]
+  (let [compras (pega-todas-compras-pelo-codigo-acao codigo-acao todas-compras)
+        total-de-acoes (calcula-total-de-acoes compras)
+        total-comprado (calcula-total-comprado compras)]
+    (if (zero? total-de-acoes)
+      {:valid :clojure.spec.alpha/valid
+       :output {:codigo-acao codigo-acao
+                :total-de-acoes 0}}
+      {:valid :clojure.spec.alpha/valid
+       :output {:codigo-acao codigo-acao
+                :total-comprado total-comprado
+                :preco-medio (calcula-preco-medio compras)
+                :total-de-acoes total-de-acoes}})))
+
+(defn descrever-compras
+  [codigo-acao todas-compras]
+  (if (codigo-acao? codigo-acao)
+    (do-descrever-compras codigo-acao todas-compras)
+    {:valid :clojure.spec.alpha/invalid
+     :output {:codigo-acao codigo-acao}}))

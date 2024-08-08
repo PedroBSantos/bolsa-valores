@@ -67,3 +67,13 @@
    (fn [acumulado atual] (+ acumulado (calcula-subtotal-comprado atual)))
    0.0
    compras))
+
+(defn calcula-total-de-acoes 
+  [compras]
+  (reduce (fn [acumulado atual] (+ acumulado (get atual :quantidade 0))) 0 compras))
+
+(defn calcula-preco-medio 
+  [compras]
+  (-> compras
+      calcula-total-comprado
+      (/ (calcula-total-de-acoes compras))))

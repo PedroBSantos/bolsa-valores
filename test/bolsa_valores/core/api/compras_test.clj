@@ -1,5 +1,6 @@
 (ns bolsa-valores.core.api.compras-test
-  (:require [bolsa-valores.core.api.compras :refer [registra-nova-compra!
+  (:require [bolsa-valores.core.api.compras :refer [descrever-compras
+                                                    registra-nova-compra!
                                                     total-comprado]]
             [clojure.test :refer [deftest is testing use-fixtures]])
   (:import [java.time LocalDate]))
@@ -45,3 +46,41 @@
   (testing "Deveria retornar erro de validação"
     (let [output (total-comprado "teste" @compras-repository)]
       (is (= :clojure.spec.alpha/invalid (get output :valid))))))
+
+(deftest descrever-compras-test
+  (testing "Deveria retornar a descrição de compras de uma determinada ação"
+    (let [data-compra (str (LocalDate/now))
+          ticket-acao "VALE3"
+          compra {:codigo-acao "VALE3" :data-compra data-compra :valor-acao 60.0 :quantidade 5}
+          _ (registra-nova-compra! (partial swap! compras-repository conj) compra)
+          compra {:codigo-acao "VALE3" :data-compra data-compra :valor-acao 55.0 :quantidade 5}
+          _ (registra-nova-compra! (partial swap! compras-repository conj) compra)
+          descricao (descrever-compras ticket-acao @compras-repository)
+          esperado {:valid :clojure.spec.alpha/valid,
+                    :output {:codigo-acao "VALE3",
+                             :total-comprado 575.0,
+                             :preco-medio 57.5,
+                             :total-de-acoes 10}}]
+      (is (= esperado descricao)))
+    
+    (let [data-compra (str (LocalDate/now))
+          compra {:codigo-acao "VALE3" :data-compra data-compra :valor-acao 60.0 :quantidade 5}
+          _ (registra-nova-compra! (partial swap! compras-repository conj) compra)
+          compra {:codigo-acao "VALE3" :data-compra data-compra :valor-acao 55.0 :quantidade 5}
+          _ (registra-nova-compra! (partial swap! compras-repository conj) compra)
+          descricao (descrever-compras "PETR4" @compras-repository)
+          esperado {:valid :clojure.spec.alpha/valid,
+                    :output {:codigo-acao "PETR4",
+                             :total-de-acoes 0}}]
+      (is (= esperado descricao))))
+  
+  (testing "Não deveria retornar a descrição de compras quando o codigo for inválido"
+    (let [data-compra (str (LocalDate/now))
+          compra {:codigo-acao "VALE3" :data-compra data-compra :valor-acao 60.0 :quantidade 5}
+          _ (registra-nova-compra! (partial swap! compras-repository conj) compra)
+          compra {:codigo-acao "VALE3" :data-compra data-compra :valor-acao 55.0 :quantidade 5}
+          _ (registra-nova-compra! (partial swap! compras-repository conj) compra)
+          descricao (descrever-compras "x" @compras-repository)
+          esperado {:valid :clojure.spec.alpha/invalid,
+                    :output {:codigo-acao "x"}}]
+      (is (= esperado descricao)))))

@@ -1,5 +1,6 @@
 (ns bolsa-valores.web.handlers
-  (:require [bolsa-valores.core.api.compras :refer [registra-nova-compra!
+  (:require [bolsa-valores.core.api.compras :refer [descrever-compras
+                                                    registra-nova-compra!
                                                     total-comprado]]
             [bolsa-valores.core.api.proventos :refer [registra-novo-provento!
                                                       total-recebido]]
@@ -27,6 +28,15 @@
         request-uri (get request :uri)]
     (if (= :clojure.spec.alpha/valid (:valid nova-compra))
       (created (str request-uri "/" (get-in response-body [:output :id])) response-body)
+      (bad-request response-body))))
+
+(defn descrever-compras-handler [request]
+  (let [codigo-acao (get-in request [:query-params "codigo-acao"] "")
+        todas-compras (q/read-all-compras)
+        descricao (descrever-compras codigo-acao todas-compras)
+        response-body (dissoc descricao :valid)]
+    (if (= :clojure.spec.alpha/valid (:valid descricao))
+      {:status 200 :body response-body}
       (bad-request response-body))))
 
 (defn compras-handler [_]
