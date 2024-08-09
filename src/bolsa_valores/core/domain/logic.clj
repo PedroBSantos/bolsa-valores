@@ -40,6 +40,9 @@
    (fn [provento] (= codigo-acao (get provento :codigo-acao "")))
    todos-proventos))
 
+(defn pega-proventos-pelo-tipo [tipo todos-proventos]
+  (filter (fn [provento] (= (get provento :tipo) tipo)) todos-proventos))
+
 (defn pega-todos-proventos-recebidos-ate-data-atual [todos-proventos]
   (filter
    (fn [provento]

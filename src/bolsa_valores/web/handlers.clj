@@ -2,7 +2,8 @@
   (:require [bolsa-valores.core.api.compras :refer [descrever-compras
                                                     registra-nova-compra!
                                                     total-comprado]]
-            [bolsa-valores.core.api.proventos :refer [registra-novo-provento!
+            [bolsa-valores.core.api.proventos :refer [descrever-proventos
+                                                      registra-novo-provento!
                                                       total-recebido]]
             [bolsa-valores.database.queries :as q]
             [ring.util.response :refer [bad-request created]]))
@@ -14,6 +15,15 @@
         request-uri (get request :uri)]
     (if (= :clojure.spec.alpha/valid (:valid novo-provento))
       (created (str request-uri "/" (get-in response-body [:output :id])) response-body)
+      (bad-request response-body))))
+
+(defn descrever-proventos-handler [request]
+  (let [codigo-acao (get-in request [:query-params "codigo-acao"] "")
+        todos-proventos (q/read-all-proventos)
+        descricao (descrever-proventos codigo-acao todos-proventos)
+        response-body (dissoc descricao :valid)]
+    (if (= :clojure.spec.alpha/valid (:valid descricao))
+      {:status 200 :body response-body}
       (bad-request response-body))))
 
 (defn proventos-handler [_]

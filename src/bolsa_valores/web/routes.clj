@@ -6,6 +6,7 @@
 (defroutes app-routes
   (POST "/proventos/adicionar-provento" [] h/novo-provento-handler)
   (GET "/proventos" [] h/proventos-handler)
+  (GET "/proventos/descrever*" [] h/descrever-proventos-handler)
   (POST "/compras/adicionar-compra" [] h/nova-compra-handler)
   (GET "/compras" [] h/compras-handler)
   (GET "/compras/descrever*" [] h/descrever-compras-handler)

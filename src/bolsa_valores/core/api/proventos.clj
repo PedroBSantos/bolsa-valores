@@ -2,6 +2,7 @@
   (:require [bolsa-valores.core.domain.logic :refer [aplica-imposto
                                                      calcula-total-recebido
                                                      codigo-acao?
+                                                     pega-proventos-pelo-tipo
                                                      pega-todos-proventos-pelo-codigo-acao
                                                      pega-todos-proventos-recebidos-ate-data-atual]]
             [bolsa-valores.core.domain.model :refer [new-provento]]
@@ -56,3 +57,24 @@
      :output {:codigo-acao codigo-acao}}))
   ([todos-proventos]
    (do-total-recebido todos-proventos)))
+
+(defn- do-descrever-proventos 
+  [codigo-acao todos-proventos]
+  (let [proventos (pega-todos-proventos-pelo-codigo-acao codigo-acao todos-proventos)
+        total-recebido (calcula-total-recebido proventos)
+        dividendos (pega-proventos-pelo-tipo "DIVIDENDO" proventos)
+        jscps (pega-proventos-pelo-tipo "JSCP" proventos)
+        total-recebido-dividendos (calcula-total-recebido dividendos)
+        total-recebido-jscp (calcula-total-recebido jscps)]
+    {:valid :clojure.spec.alpha/valid
+     :output {:codigo-acao codigo-acao
+              :total-recebido total-recebido
+              :total-em-dividendos total-recebido-dividendos
+              :total-em-jscp total-recebido-jscp}}))
+
+(defn descrever-proventos 
+  [codigo-acao todos-proventos]
+  (if (codigo-acao? codigo-acao)
+    (do-descrever-proventos codigo-acao todos-proventos)
+    {:valid :clojure.spec.alpha/invalid
+     :output {:codigo-acao codigo-acao}}))

@@ -1,5 +1,6 @@
 (ns bolsa-valores.core.api.proventos-test
-  (:require [bolsa-valores.core.api.proventos :refer [registra-novo-provento!
+  (:require [bolsa-valores.core.api.proventos :refer [descrever-proventos
+                                                      registra-novo-provento!
                                                       total-recebido]]
             [bolsa-valores.core.domain.model :refer [new-provento]]
             [clojure.test :refer [deftest is testing use-fixtures]])
@@ -40,3 +41,24 @@
           proventos [provento-1 provento-2]
           output (total-recebido "VAL3" proventos)]
       (is (= :clojure.spec.alpha/invalid (get output :valid))))))
+
+(deftest descrever-proventos-test
+  (testing "Deveria retornar uma descrição de proventos recebidos de uma ação"
+    (let [provento-1 (new-provento (random-uuid) "PETR4" (str (LocalDate/of 2024 04 05)) "JSCP" 0.54)
+          provento-2 (new-provento (random-uuid) "PETR4" (str (LocalDate/of 2024 06 05)) "DIVIDENDO" 2.70)
+          provento-3 (new-provento (random-uuid) "PETR4" (str (LocalDate/of 2024 06 05)) "DIVIDENDO" 0.70)
+          proventos [provento-1 provento-2 provento-3]
+          esperado {:valid :clojure.spec.alpha/valid
+                    :output {:codigo-acao "PETR4"
+                             :total-recebido 3.9400000000000004
+                             :total-em-dividendos 3.4000000000000004
+                             :total-em-jscp 0.54}}]
+      (is (= esperado (descrever-proventos "PETR4" proventos))))
+    
+    (let [proventos []
+          esperado {:valid :clojure.spec.alpha/valid
+                    :output {:codigo-acao "PETR4"
+                             :total-recebido 0.0
+                             :total-em-dividendos 0.0
+                             :total-em-jscp 0.0}}]
+      (is (= esperado (descrever-proventos "PETR4" proventos))))))

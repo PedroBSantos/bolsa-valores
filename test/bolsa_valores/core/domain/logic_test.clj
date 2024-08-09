@@ -5,6 +5,7 @@
                                                      calcula-total-de-acoes
                                                      calcula-total-recebido
                                                      codigo-acao?
+                                                     pega-proventos-pelo-tipo
                                                      pega-todas-compras-pelo-codigo-acao
                                                      pega-todos-proventos-pelo-codigo-acao
                                                      pega-todos-proventos-recebidos-ate-data-atual
@@ -131,3 +132,17 @@
     (let [compra-1 (new-compra (random-uuid) "GOAU4" (str (LocalDate/now)) 9.94 40)
           compra-2 (new-compra (random-uuid) "GOAU4" (str (LocalDate/now)) 10.0 40)]
       (is (= 9.969999999999999 (calcula-preco-medio [compra-1 compra-2]))))))
+
+(deftest pega-proventos-pelo-tipo-test
+  (testing "Deveria filtrar os proventos pelo tipo"
+    (let [data-atual (LocalDate/now)
+          amanha (.plusDays data-atual 1)
+          provento-1 (new-provento (random-uuid) "PETR4" (str data-atual) "JSCP" 0.54)
+          provento-2 (new-provento (random-uuid) "PETR4" (str amanha) "DIVIDENDO" 0.54)
+          proventos [provento-1 provento-2]
+          filtrado-dividendo (pega-proventos-pelo-tipo "DIVIDENDO" proventos)
+          filtrado-jscp (pega-proventos-pelo-tipo "JSCP" proventos)
+          filtrado (pega-proventos-pelo-tipo "T" proventos)]
+      (is (= 1 (count filtrado-dividendo)))
+      (is (= 1 (count filtrado-jscp)))
+      (is (zero? (count filtrado))))))
