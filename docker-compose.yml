@@ -1,0 +1,130 @@
+services:
+  bolsa-valores:
+    container_name: bolsa-valores-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - TZ=America/Recife
+    ports:
+      - 8080:8080
+    networks:
+      - default
+    depends_on:
+      - collector
+      - postgre
+  
+  postgre:
+    image: postgres:17.0
+    container_name: postgres-container
+    restart: always
+    environment:
+      - TZ=America/Recife
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bolsa_valores
+    volumes:
+      - ./test/bolsa_valores/database/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+    ports:
+      - 5432:5432
+    networks:
+      - default
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: grafana-container
+    restart: always
+    environment:
+      - TZ=America/Recife
+    volumes:
+      - ./telemetry/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+    ports:
+      - 3000:3000
+    networks:
+      - default
+    depends_on:
+      - collector
+
+  prometheus:
+    image: prom/prometheus:v2.53.3
+    container_name: prometheus-container
+    restart: always
+    environment:
+      - TZ=America/Recife
+    ports:
+      - 9090:9090
+    volumes:
+      - ./telemetry/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: "--web.enable-remote-write-receiver --config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - default
+    depends_on:
+      - blackbox
+  
+  blackbox:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: blackbox-container
+    restart: always
+    environment:
+      - TZ=America/Recife
+    ports:
+      - 9115:9115
+    volumes:
+      - ./telemetry/blackbox.yml:/config/blackbox.yml
+    command: "--config.file=/config/blackbox.yml"
+    networks:
+      - default
+
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.112.0
+    container_name: otlp-container
+    command: "--config /etc/otel-config.yaml"
+    environment:
+      - TZ=America/Recife
+    volumes:
+      - ./telemetry/otel-config.yaml:/etc/otel-config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "55679:55679"
+      - "1888:1888"
+      - "8888:8888"
+      - "8889:8889"
+    depends_on:
+      - loki
+      - tempo
+      - prometheus
+    networks:
+      - default
+
+  loki:
+    image: grafana/loki:3.1.2
+    container_name: loki-container
+    command: -config.file=/etc/loki/local-config.yaml
+    environment:
+      - TZ=America/Recife
+    ports:
+      - "3100:3100"
+      - "9095:9095"
+    networks:
+      - default
+  
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: tempo-container
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./telemetry/tempo.yml:/etc/tempo.yaml
+      - ./telemetry/overrides.yml:/etc/overrides.yaml
+    environment:
+      - TZ=America/Recife
+    ports:
+      - "3200:3200"
+    networks:
+      - default
+
+networks:
+  default:
+    external: true
+    name: dev
