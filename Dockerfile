@@ -1,10 +1,10 @@
-FROM clojure:temurin-21-lein-2.11.2-alpine AS build
+FROM clojure:temurin-23-lein-2.11.2-alpine AS build
 COPY . /app/
 WORKDIR /app/
 RUN lein clean && lein deps
 RUN lein with-profile docker uberjar
 
-FROM eclipse-temurin:21.0.4_7-jre-alpine AS final
+FROM eclipse-temurin:23.0.1_11-jre-alpine AS final
 COPY --from=build /app/target/uberjar/bolsa-valores-0.1.0-SNAPSHOT-standalone.jar /app/bolsa-valores.jar
 WORKDIR /app/
 RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.9.0/opentelemetry-javaagent.jar
