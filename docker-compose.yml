@@ -13,23 +13,23 @@ services:
       - default
     depends_on:
       - collector
-      - postgre
+      # - postgre
   
-  postgre:
-    image: postgres:17.0
-    container_name: postgres-container
-    restart: always
-    environment:
-      - TZ=America/Recife
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=bolsa_valores
-    volumes:
-      - ./test/bolsa_valores/database/tables.sql:/docker-entrypoint-initdb.d/tables.sql
-    ports:
-      - 5432:5432
-    networks:
-      - default
+  # postgre:
+  #   image: postgres:17.0
+  #   container_name: postgres-container
+  #   restart: always
+  #   environment:
+  #     - TZ=America/Recife
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=bolsa_valores
+  #   volumes:
+  #     - ./test/bolsa_valores/database/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+  #   ports:
+  #     - 5432:5432
+  #   networks:
+  #     - default
 
   grafana:
     image: grafana/grafana:11.3.0-security-01
@@ -56,6 +56,7 @@ services:
       - 9090:9090
     volumes:
       - ./telemetry/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
     command: "--web.enable-remote-write-receiver --config.file=/etc/prometheus/prometheus.yml"
     networks:
       - default
@@ -101,6 +102,9 @@ services:
   loki:
     image: grafana/loki:3.2.1
     container_name: loki-container
+    volumes:
+      - ./telemetry/local-config.yaml:/etc/loki/local-config.yaml
+      - loki:/loki
     command: -config.file=/etc/loki/local-config.yaml
     environment:
       - TZ=America/Recife
@@ -117,6 +121,8 @@ services:
     volumes:
       - ./telemetry/tempo.yml:/etc/tempo.yaml
       - ./telemetry/overrides.yml:/etc/overrides.yaml
+      - tempo:/var/tempo
+      - tempo:/tmp/tempo
     environment:
       - TZ=America/Recife
     ports:
@@ -128,3 +134,11 @@ networks:
   default:
     external: true
     name: dev
+
+volumes:
+  prometheus:
+    external: true
+  loki:
+    external: true
+  tempo:
+    external: true
