@@ -13,23 +13,23 @@ services:
       - default
     depends_on:
       - collector
-      # - postgre
+      - postgre
   
-  # postgre:
-  #   image: postgres:17.0
-  #   container_name: postgres-container
-  #   restart: always
-  #   environment:
-  #     - TZ=America/Recife
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #     - POSTGRES_DB=bolsa_valores
-  #   volumes:
-  #     - ./test/bolsa_valores/database/tables.sql:/docker-entrypoint-initdb.d/tables.sql
-  #   ports:
-  #     - 5432:5432
-  #   networks:
-  #     - default
+  postgre:
+    image: postgres:17.0
+    container_name: postgres-container
+    restart: always
+    environment:
+      - TZ=America/Recife
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bolsa_valores
+    volumes:
+      - ./test/bolsa_valores/database/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+    ports:
+      - 5432:5432
+    networks:
+      - default
 
   grafana:
     image: grafana/grafana:11.3.0-security-01
