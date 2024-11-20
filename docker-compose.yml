@@ -39,6 +39,7 @@ services:
       - TZ=America/Recife
     volumes:
       - ./telemetry/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - grafana:/var/lib/grafana
     ports:
       - 3000:3000
     networks:
@@ -141,4 +142,6 @@ volumes:
   loki:
     external: true
   tempo:
+    external: true
+  grafana:
     external: true
