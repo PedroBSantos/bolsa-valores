@@ -6,7 +6,8 @@
                                                      pega-todos-proventos-pelo-codigo-acao
                                                      pega-todos-proventos-recebidos-ate-data-atual]]
             [bolsa-valores.core.domain.model :refer [new-provento]]
-            [clojure.spec.alpha :as s])
+            [clojure.spec.alpha :as s]
+            [clojure.tools.logging :as l])
   (:import [java.time LocalDate]
            [java.time.format DateTimeParseException]))
 
@@ -34,8 +35,10 @@
   [adiciona-provento! provento]
   (if (s/valid? ::novo-provento-spec provento)
     (do-registra-novo-provento! adiciona-provento! provento)
-    {:valid :clojure.spec.alpha/invalid
-     :output provento}))
+    (do
+      (l/warn "Erro ao registrar provento")
+      {:valid :clojure.spec.alpha/invalid
+     :output provento})))
 
 (defn- do-total-recebido 
   ([codigo-acao todos-proventos]

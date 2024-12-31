@@ -5,7 +5,8 @@
                                                      pega-todas-compras-pelo-codigo-acao
                                                      calcula-total-de-acoes]]
             [bolsa-valores.core.domain.model :refer [new-compra]]
-            [clojure.spec.alpha :as s])
+            [clojure.spec.alpha :as s]
+            [clojure.tools.logging :as l])
   (:import [java.time LocalDate]
            [java.time.format DateTimeParseException]))
 
@@ -31,8 +32,10 @@
   [adiciona-compra! compra]
   (if (s/valid? ::nova-compra-spec compra)
     (do-registra-nova-compra! adiciona-compra! compra)
-    {:valid :clojure.spec.alpha/invalid
-     :output compra}))
+    (do
+      (l/warn "Erro ao registrar compra")
+      {:valid :clojure.spec.alpha/invalid
+     :output compra})))
 
 (defn- do-total-comprado
   ([codigo-acao todas-compras]

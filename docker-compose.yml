@@ -32,7 +32,7 @@ services:
       - default
 
   grafana:
-    image: grafana/grafana:11.3.0-security-01
+    image: grafana/grafana:11.4.0
     container_name: grafana-container
     restart: always
     environment:
@@ -101,7 +101,7 @@ services:
       - default
 
   loki:
-    image: grafana/loki:3.2.1
+    image: grafana/loki:3.3.0
     container_name: loki-container
     volumes:
       - ./telemetry/local-config.yaml:/etc/loki/local-config.yaml
