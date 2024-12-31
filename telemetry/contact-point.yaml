@@ -1,0 +1,12 @@
+apiVersion: 1
+contactPoints:
+    - orgId: 1
+      name: google-chat-dev-homolog
+      receivers:
+        - uid: fe8hv070lc6bla
+          type: googlechat
+          settings:
+            message: '{{ template "custom.alerts" . }}'
+            title: '{{ template "custom.title" . }}'
+            url: https://google.chat.com/webhook-url
+          disableResolveMessage: true
