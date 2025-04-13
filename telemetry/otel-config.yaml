@@ -41,7 +41,7 @@ service:
   pipelines:
     logs:
       receivers: [otlp]
-      processors: [resource, batch]
+      processors: [batch]
       exporters: [loki, debug]
     traces:
       receivers: [otlp]

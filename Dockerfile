@@ -7,7 +7,7 @@ RUN lein with-profile docker uberjar
 FROM eclipse-temurin:23.0.1_11-jre-alpine AS final
 COPY --from=build /app/target/uberjar/bolsa-valores-0.1.0-SNAPSHOT-standalone.jar /app/bolsa-valores.jar
 WORKDIR /app/
-RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.11.0/opentelemetry-javaagent.jar
+RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.15.0/opentelemetry-javaagent.jar
 ENTRYPOINT java -javaagent:./opentelemetry-javaagent.jar \
     -Dotel.service.name=bolsa-valores \
     -Dotel.exporter.otlp.endpoint=http://otlp-container:4317 \
