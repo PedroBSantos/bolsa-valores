@@ -48,7 +48,7 @@ services:
       - collector
 
   prometheus:
-    image: prom/prometheus:v3.2.1
+    image: prom/prometheus:v3.3.0
     container_name: prometheus-container
     restart: always
     environment:
@@ -138,10 +138,10 @@ networks:
 
 volumes:
   prometheus:
-    external: true
+    external: false
   loki:
-    external: true
+    external: false
   tempo:
-    external: true
+    external: false
   grafana:
-    external: true
+    external: false

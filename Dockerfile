@@ -6,17 +6,11 @@ RUN lein with-profile docker uberjar
 
 FROM eclipse-temurin:23.0.1_11-jre-alpine AS final
 COPY --from=build /app/target/uberjar/bolsa-valores-0.1.0-SNAPSHOT-standalone.jar /app/bolsa-valores.jar
+COPY resources/config/otel.docker.properties /app/
 WORKDIR /app/
-RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.15.0/opentelemetry-javaagent.jar
-ENTRYPOINT java -javaagent:./opentelemetry-javaagent.jar \
-    -Dotel.service.name=bolsa-valores \
-    -Dotel.exporter.otlp.endpoint=http://otlp-container:4317 \
-    -Dotel.instrumentation.http.client.enabled=true \
-    -Dotel.traces.exporter=otlp \
-    -Dotel.metrics.exporter=otlp \
-    -Dotel.logs.exporter=otlp \
-    -Dotel.exporter.otlp.protocol=grpc \
-    -Dconf="config/docker.edn" \
+ENV JAVA_TOOL_OPTIONS="-javaagent:/app/opentelemetry-javaagent.jar -Dotel.javaagent.configuration-file=./otel.docker.properties"
+RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+ENTRYPOINT java -Dconf="config/docker.edn" \
     -Dclojure.tools.logging.factory=clojure.tools.logging.impl/log4j2-factory \
     -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager \
     -jar ./bolsa-valores.jar
