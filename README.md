@@ -9,8 +9,4 @@ lein test para executar todos os testes
 
 ## Execução no Docker
 
-- docker volume create tempo
-- docker volume create loki
-- docker volume create grafana
-- docker volume create prometheus
 - docker compose -f docker-compose.yml -p bolsa-valores up -d
